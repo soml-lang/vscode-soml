@@ -1,0 +1,11 @@
+**/*
+!package.json
+!readme.md
+!license
+!third-party-notices.txt
+!language-configuration.json
+!syntaxes/**
+!snippets/**
+!distribution/extension.cjs
+!distribution/extension.js
+!icon.png

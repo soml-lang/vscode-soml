@@ -1,0 +1,14 @@
+{
+	"extends": "@sindresorhus/tsconfig",
+	"compilerOptions": {
+		"lib": [
+			"ESNext",
+			"DOM"
+		],
+		"allowImportingTsExtensions": true,
+		"noEmit": true
+	},
+	"include": [
+		"source/**/*.ts"
+	]
+}

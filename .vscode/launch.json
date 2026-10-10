@@ -1,0 +1,4 @@
+{
+	"version": "0.2.0",
+	"configurations": [{"name": "SOML Extension", "type": "extensionHost", "request": "launch", "args": ["--extensionDevelopmentPath=${workspaceFolder}"], "outFiles": ["${workspaceFolder}/distribution/**/*.js", "${workspaceFolder}/distribution/**/*.cjs"], "preLaunchTask": "npm: build"}]
+}

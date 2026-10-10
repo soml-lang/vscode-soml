@@ -1,0 +1,264 @@
+{
+	"$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+	"name": "soml",
+	"scopeName": "source.soml",
+	"fileTypes": [
+		"soml"
+	],
+	"patterns": [
+		{
+			"include": "#comment"
+		},
+		{
+			"include": "#value"
+		},
+		{
+			"include": "#key"
+		},
+		{
+			"include": "#string"
+		},
+		{
+			"include": "#punctuation"
+		}
+	],
+	"repository": {
+		"comment": {
+			"patterns": [
+				{
+					"match": "(#).*",
+					"name": "comment.line.number-sign.soml",
+					"captures": {
+						"1": {
+							"name": "punctuation.definition.comment.soml"
+						}
+					}
+				},
+				{
+					"begin": "/\\*",
+					"end": "\\*/",
+					"name": "comment.block.soml",
+					"beginCaptures": {
+						"0": {
+							"name": "punctuation.definition.comment.begin.soml"
+						}
+					},
+					"endCaptures": {
+						"0": {
+							"name": "punctuation.definition.comment.end.soml"
+						}
+					},
+					"patterns": [
+						{
+							"match": "/\\*(?!/)",
+							"name": "invalid.illegal.nested-comment.soml"
+						}
+					]
+				}
+			]
+		},
+		"key": {
+			"comment": "A key is one bare or quoted key, directly followed by a colon. A `.` directly after a key is an error, so the lookahead also takes keys and empty parts joined by dots, as in `a.b: 1` and `a.: 1`, and marks each `.` as invalid. The grammar does not track whether it is in key position, so it finds a key by its colon, and that is what lets `404: 'x'` and `true: 1` be keys. A key starts a line, or follows a space, a tab, a `{`, a `,`, or a `/`, so that it can follow a `/* */` comment, and it never follows a `:` or a `[`, even with one space or tab between. So a value that is not valid, such as `2026-09-19t14:00:00Z`, does not look like keys when it is the first value after a `:` or a `[`, and a long line is not searched for a key at every character. Elsewhere, such as after a `,`, after another value, or after more than one space or tab, such a value can still look like keys, because telling an array item from a key there needs the parse state, which a TextMate grammar does not keep. A valid instant, such as `2026-09-19T14:00:00Z` after a `,`, also starts like a key, so the value rule comes before this one. A value never ends in a `.` or a `:`, so that order never takes a key for a value.",
+			"begin": "(?<![^ \\t,{/])(?<![:\\[][ \\t])(?=(?:[A-Za-z0-9_-]+|'[^'\\n]*'|\"(?:[^\"\\\\\\n]|\\\\.)*\")(?:\\.(?:[A-Za-z0-9_-]+|'[^'\\n]*'|\"(?:[^\"\\\\\\n]|\\\\.)*\")?)*:)",
+			"end": ":",
+			"endCaptures": {
+				"0": {
+					"name": "punctuation.separator.key-value.soml"
+				}
+			},
+			"patterns": [
+				{
+					"match": "[A-Za-z0-9_-]+",
+					"name": "support.type.property-name.soml"
+				},
+				{
+					"match": "(')[^']*(')",
+					"name": "string.quoted.single.soml support.type.property-name.soml",
+					"captures": {
+						"1": {
+							"name": "punctuation.definition.string.begin.soml"
+						},
+						"2": {
+							"name": "punctuation.definition.string.end.soml"
+						}
+					}
+				},
+				{
+					"begin": "\"",
+					"end": "\"",
+					"name": "string.quoted.double.soml support.type.property-name.soml",
+					"beginCaptures": {
+						"0": {
+							"name": "punctuation.definition.string.begin.soml"
+						}
+					},
+					"endCaptures": {
+						"0": {
+							"name": "punctuation.definition.string.end.soml"
+						}
+					},
+					"patterns": [
+						{
+							"include": "#escape"
+						}
+					]
+				},
+				{
+					"match": "\\.",
+					"name": "invalid.illegal.dot-after-key.soml"
+				}
+			]
+		},
+		"string": {
+			"patterns": [
+				{
+					"comment": "The closing delimiter is a run of exactly as many quotes as the opening one, at the start of a line after spaces and tabs. The `\\G` lets it close after the prefix that a Markdown list item or blockquote consumes.",
+					"begin": "('{3,})(.*)$",
+					"end": "(?:^|\\G)[ \\t]*(\\1)(?!')",
+					"name": "string.quoted.single.block.soml",
+					"beginCaptures": {
+						"1": {
+							"name": "punctuation.definition.string.begin.soml"
+						},
+						"2": {
+							"name": "invalid.illegal.text-after-delimiter.soml"
+						}
+					},
+					"endCaptures": {
+						"1": {
+							"name": "punctuation.definition.string.end.soml"
+						}
+					}
+				},
+				{
+					"begin": "(\"{3,})(.*)$",
+					"end": "(?:^|\\G)[ \\t]*(\\1)(?!\")",
+					"name": "string.quoted.double.block.soml",
+					"beginCaptures": {
+						"1": {
+							"name": "punctuation.definition.string.begin.soml"
+						},
+						"2": {
+							"name": "invalid.illegal.text-after-delimiter.soml"
+						}
+					},
+					"endCaptures": {
+						"1": {
+							"name": "punctuation.definition.string.end.soml"
+						}
+					},
+					"patterns": [
+						{
+							"include": "#escape"
+						}
+					]
+				},
+				{
+					"begin": "'",
+					"end": "'|$",
+					"name": "string.quoted.single.soml",
+					"beginCaptures": {
+						"0": {
+							"name": "punctuation.definition.string.begin.soml"
+						}
+					},
+					"endCaptures": {
+						"0": {
+							"name": "punctuation.definition.string.end.soml"
+						}
+					}
+				},
+				{
+					"begin": "\"",
+					"end": "\"|$",
+					"name": "string.quoted.double.soml",
+					"beginCaptures": {
+						"0": {
+							"name": "punctuation.definition.string.begin.soml"
+						}
+					},
+					"endCaptures": {
+						"0": {
+							"name": "punctuation.definition.string.end.soml"
+						}
+					},
+					"patterns": [
+						{
+							"include": "#escape"
+						}
+					]
+				}
+			]
+		},
+		"escape": {
+			"patterns": [
+				{
+					"comment": "`\\u{…}` names a Unicode scalar value other than U+000D, in lowercase hex with no leading zero.",
+					"match": "\\\\(?:[\\\\\"nt]|u\\{(?!d\\}|d[89a-f][0-9a-f]{2}\\})(?:0|[1-9a-f][0-9a-f]{0,4}|10[0-9a-f]{4})\\})",
+					"name": "constant.character.escape.soml"
+				},
+				{
+					"match": "\\\\(?:u\\{[^}\"\\\\]*\\}?|.)?",
+					"name": "invalid.illegal.unrecognized-string-escape.soml"
+				}
+			]
+		},
+		"value": {
+			"comment": "One alternative per type, in the order instant, duration, float, hexadecimal, octal, binary, and decimal int, `true` or `false`, and `null`, each in its own capture. A value starts after a space, a tab, a `,`, a `[`, a `{`, a `:`, or a `/`, so that it can follow a `/* */` comment, and it ends before a space, a tab, the end of the line, a `,`, a `]`, a `}`, a `#`, or a `/`, so that a comment can follow it. So a value that is not valid, such as `0xff`, is not highlighted in part, and the first alternative that reaches such an end wins, such as the float in `1.5` and the duration in `1.5s`. Only a space, a tab, and a line break are whitespace in SOML, so a value or a key next to another whitespace character, such as U+00A0, is not highlighted either. An instant's components are checked against their ranges, but not whether the day exists in its month or whether the instant is in range in UTC. A duration's units are in descending order, each at most once, only its last part may have a fraction, and a duration of zero has no `-`. A float has a fraction, an exponent, or both, so its `(?=[.e])` requires at least one of them.",
+			"match": "(?<![^ \\t,\\[{:/])(?:((?!0000)[0-9]{4}-(?:0[1-9]|1[0-2])-(?:0[1-9]|[12][0-9]|3[01])T(?:[01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9](?:\\.[0-9]{1,9})?(?:Z|(?!-00:00)[+-](?:[01][0-9]|2[0-3]):[0-5][0-9]))|((?:-(?![0._hmsun]+(?![^ \\t\\n,\\]}#/])))?(?=[0-9])(?![0-9_.hmsun]*\\.[0-9_]+[hmsun]+[0-9])(?:(?:0|[1-9](?:_?[0-9])*)(?:\\.[0-9](?:_?[0-9])*)?h)?(?:(?:0|[1-9](?:_?[0-9])*)(?:\\.[0-9](?:_?[0-9])*)?m(?!s))?(?:(?:0|[1-9](?:_?[0-9])*)(?:\\.[0-9](?:_?[0-9])*)?s)?(?:(?:0|[1-9](?:_?[0-9])*)(?:\\.[0-9](?:_?[0-9])*)?ms)?(?:(?:0|[1-9](?:_?[0-9])*)(?:\\.[0-9](?:_?[0-9])*)?us)?(?:(?:0|[1-9](?:_?[0-9])*)(?:\\.[0-9](?:_?[0-9])*)?ns)?)|(-?(?:infinity|(?:0|[1-9](?:_?[0-9])*)(?=[.e])(?:\\.[0-9](?:_?[0-9])*)?(?:e(?:0|-?[1-9](?:_?[0-9])*))?))|(0x[0-9A-F](?:_?[0-9A-F])*)|(0o[0-7](?:_?[0-7])*)|(0b[01](?:_?[01])*)|(0|-?[1-9](?:_?[0-9])*)|(true|false)|(null))(?![^ \\t\\n,\\]}#/])",
+			"captures": {
+				"1": {
+					"name": "constant.numeric.instant.soml"
+				},
+				"2": {
+					"name": "constant.numeric.duration.soml"
+				},
+				"3": {
+					"name": "constant.numeric.float.soml"
+				},
+				"4": {
+					"name": "constant.numeric.integer.hexadecimal.soml"
+				},
+				"5": {
+					"name": "constant.numeric.integer.octal.soml"
+				},
+				"6": {
+					"name": "constant.numeric.integer.binary.soml"
+				},
+				"7": {
+					"name": "constant.numeric.integer.decimal.soml"
+				},
+				"8": {
+					"name": "constant.language.boolean.soml"
+				},
+				"9": {
+					"name": "constant.language.null.soml"
+				}
+			}
+		},
+		"punctuation": {
+			"patterns": [
+				{
+					"match": "\\{",
+					"name": "punctuation.definition.object.begin.soml"
+				},
+				{
+					"match": "\\}",
+					"name": "punctuation.definition.object.end.soml"
+				},
+				{
+					"match": "\\[",
+					"name": "punctuation.definition.array.begin.soml"
+				},
+				{
+					"match": "\\]",
+					"name": "punctuation.definition.array.end.soml"
+				},
+				{
+					"match": ",",
+					"name": "punctuation.separator.comma.soml"
+				}
+			]
+		}
+	}
+}

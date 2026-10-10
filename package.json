@@ -1,0 +1,180 @@
+{
+	"name": "soml",
+	"version": "0.0.1",
+	"description": "SOML language support with validation, formatting, navigation, and precise value hovers.",
+	"license": "MIT",
+	"repository": "https://github.com/soml-lang/vscode-soml",
+	"author": "Sindre Sorhus <sindresorhus@gmail.com> (https://sindresorhus.com)",
+	"type": "module",
+	"main": "./distribution/extension.js",
+	"browser": "./distribution/extension.cjs",
+	"engines": {
+		"vscode": "^1.105.0"
+	},
+	"scripts": {
+		"build": "node scripts/build.js",
+		"check": "tsc --noEmit",
+		"lint": "xo",
+		"test": "npm run lint && npm run check && npm run build && node --experimental-vm-modules --test \"test/*.test.js\"",
+		"test:integration": "npm run build && node scripts/test-integration.js",
+		"test:integration:web": "npm run build && node scripts/test-integration.js --web",
+		"test:conformance": "node scripts/conformance.js",
+		"vscode:prepublish": "npm run build",
+		"package": "vsce package --no-dependencies",
+		"benchmark": "node --experimental-bench --bench --bench-warmup=5 scripts/benchmark.js"
+	},
+	"keywords": [
+		"configuration",
+		"syntax",
+		"formatter"
+	],
+	"dependencies": {
+		"soml-lang": "0.0.6"
+	},
+	"devDependencies": {
+		"@sindresorhus/tsconfig": "^8.1.0",
+		"@types/node": "^26.6.5",
+		"@types/vscode": "1.105.0",
+		"@typescript/native": "npm:typescript@^7.0.2",
+		"@vscode/test-electron": "^3.1.0",
+		"@vscode/vsce": "^4.0.0",
+		"esbuild": "^0.28.2",
+		"tm-grammars": "^1.32.22",
+		"typescript": "npm:@typescript/typescript6@^6.0.2",
+		"vscode-oniguruma": "^2.0.1",
+		"vscode-textmate": "^9.3.2",
+		"xo": "^5.0.1"
+	},
+	"displayName": "SOML",
+	"publisher": "sindresorhus",
+	"categories": [
+		"Programming Languages",
+		"Formatters",
+		"Linters"
+	],
+	"capabilities": {
+		"untrustedWorkspaces": {
+			"supported": true
+		},
+		"virtualWorkspaces": true
+	},
+	"contributes": {
+		"languages": [
+			{
+				"id": "soml",
+				"aliases": [
+					"SOML",
+					"soml"
+				],
+				"extensions": [
+					".soml"
+				],
+				"configuration": "./language-configuration.json"
+			}
+		],
+		"grammars": [
+			{
+				"language": "soml",
+				"scopeName": "source.soml",
+				"path": "./syntaxes/soml.tmLanguage.json"
+			},
+			{
+				"scopeName": "markdown.soml.codeblock",
+				"path": "./syntaxes/markdown.tmLanguage.json",
+				"injectTo": [
+					"text.html.markdown"
+				],
+				"embeddedLanguages": {
+					"meta.embedded.block.soml": "soml"
+				}
+			}
+		],
+		"snippets": [
+			{
+				"language": "soml",
+				"path": "./snippets/soml.json"
+			}
+		],
+		"commands": [
+			{
+				"command": "soml.pasteAsString",
+				"title": "Paste as String",
+				"category": "SOML",
+				"enablement": "editorLangId == soml"
+			},
+			{
+				"command": "soml.copyKeyPath",
+				"title": "Copy Key Path",
+				"category": "SOML",
+				"enablement": "editorLangId == soml"
+			},
+			{
+				"command": "soml.goToKeyPath",
+				"title": "Go to Key Path",
+				"category": "SOML",
+				"enablement": "editorLangId == soml"
+			},
+			{
+				"command": "soml.insertCurrentInstant",
+				"title": "Insert Current UTC Instant",
+				"category": "SOML",
+				"enablement": "editorLangId == soml"
+			}
+		],
+		"menus": {
+			"commandPalette": [
+				{
+					"command": "soml.pasteAsString",
+					"when": "editorLangId == soml"
+				},
+				{
+					"command": "soml.copyKeyPath",
+					"when": "editorLangId == soml"
+				},
+				{
+					"command": "soml.goToKeyPath",
+					"when": "editorLangId == soml"
+				},
+				{
+					"command": "soml.insertCurrentInstant",
+					"when": "editorLangId == soml"
+				}
+			]
+		},
+		"configuration": {
+			"title": "SOML",
+			"properties": {
+				"soml.validation.enabled": {
+					"type": "boolean",
+					"default": true,
+					"scope": "resource",
+					"description": "Report SOML syntax and value errors."
+				},
+				"soml.maxDocumentSize": {
+					"type": "integer",
+					"default": 1000000,
+					"minimum": 1000,
+					"maximum": 10000000,
+					"scope": "resource",
+					"description": "Maximum document size in UTF-16 code units for validation, formatting, and navigation. Highlighting remains available for larger files."
+				}
+			}
+		},
+		"configurationDefaults": {
+			"[soml]": {
+				"editor.insertSpaces": false,
+				"editor.formatOnType": true,
+				"editor.detectIndentation": false,
+				"editor.wordSeparators": "`~!@#$%^&*()=+[{]}\\|;:'\",.<>/?",
+				"files.eol": "\n",
+				"files.trimTrailingWhitespace": false,
+				"editor.quickSuggestions": {
+					"strings": false,
+					"comments": false,
+					"other": true
+				}
+			}
+		}
+	},
+	"icon": "icon.png"
+}

@@ -1,0 +1,8 @@
+{
+	"Object": {"prefix": "object", "body": ["${1:key}: {", "\t${2:name}: ${3:'value'}", "}"], "description": "Object with a named member"},
+	"Array": {"prefix": "array", "body": ["${1:key}: [", "\t${2:'value'}", "]"], "description": "Array with one item per line"},
+	"Literal block string": {"prefix": "block", "body": ["${1:key}:", "\t'''", "\t${2:text}", "\t'''"], "description": "Multiline text without escapes"},
+	"Escaped block string": {"prefix": "escaped-block", "body": ["${1:key}:", "\t\"\"\"", "\t${2:text}", "\t\"\"\""], "description": "Multiline text with escapes"},
+	"Duration": {"prefix": "duration", "body": "${1:timeout}: ${2:30}${3|s,ms,m,h,us,ns|}", "description": "Duration with an explicit unit"},
+	"Instant": {"prefix": "instant", "body": "${1:created}: ${2:2026-01-01T00:00:00Z}", "description": "Instant with a required UTC offset"}
+}
